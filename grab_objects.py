@@ -28,7 +28,7 @@ def silence():
                 sys.stdout = old_stdout
 
 
-def reduce_list(infile,objfile,objname,overwrite=True):
+def reduce_list(infile, objfile, objname, overwrite=True):
     obj=pickle.load(open(objfile,'rb'))
     pos=np.where(obj.Name==objname)[0]
     if len(pos)!=1:
@@ -53,7 +53,9 @@ def reduce_list(infile,objfile,objname,overwrite=True):
         return urls[ok]
 
 
-def grab(outfile='out.p',plot=True):
+def find_all_moving_objects(outfile='out.p',plot=True):
+    '''Find all the moving objects in K2
+    '''
     obj=pd.DataFrame(columns=['InvestigationID','Name','Campaign','EPICs','dist','tpfs','minmag','maxmag'])
     k=0
     print('Finding TILES')
@@ -96,7 +98,6 @@ def grab(outfile='out.p',plot=True):
             obj.loc[k]=(np.transpose([i,i2,campaign,'',0,0,0,0]))
             k+=1
 
-
         for i in ids:
             mask=[i in d for d in df[' Investigation IDs']]
             epic=np.asarray(df[df.columns[0]][mask])
@@ -120,6 +121,7 @@ def grab(outfile='out.p',plot=True):
                 pbar.update()
     pickle.dump(obj,open(outfile,'wb'))
     print('Saved to {}'.format(outfile))
+    return obj
     if plot==True:
         minmag=np.asarray(obj.minmag,dtype=float)
         maxmag=np.asarray(obj.maxmag,dtype=float)
@@ -135,9 +137,9 @@ def grab(outfile='out.p',plot=True):
         plt.gca().invert_yaxis()
         cbar=plt.colorbar(ticks=np.arange(20))
         cbar.set_label('Campaign')
-        plt.title('Moving Bodies in K2',fontsize=20)
+        plt.title('Moving Bodies in K2', fontsize=20)
         plt.xscale('log')
-        plt.savefig('bodies.png',dpi=200,bbox_inches='tight')
+        plt.savefig('bodies.png', dpi=200, bbox_inches='tight')
         print('Plot saved to bodies.png')
 
 
